@@ -26,8 +26,8 @@ import scipy.special as sp
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 from scipy import signal
 from allantools import *
-#import clock_analyzer
-#reload(clock_analyzer)
+import clock_analyzer
+reload(clock_analyzer)
 
 my_params = {
     'axes.linewidth': 1.5,
