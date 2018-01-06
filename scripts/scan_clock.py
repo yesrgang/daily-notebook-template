@@ -223,8 +223,8 @@ parameter_values = {
     'sequencer': {
         'sequence': SEQUENCE,
         '*Trabi': rabi_times,
-        '*XCCclk': -9,
-        '*YCCclk': -9,
+        '*XCCclk': 0.78,
+        '*YCCclk': 0.24,
         '*ZCCclk': bias_field,
         '*Iclk': clock_intensity,
         '*Tpi': Tpi,
