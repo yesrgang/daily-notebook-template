@@ -26,8 +26,8 @@ import scipy.special as sp
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 from scipy import signal
 from allantools import *
-import clock_analyzer
-reload(clock_analyzer)
+#import clock_analyzer
+#reload(clock_analyzer)
 
 my_params = {
     'axes.linewidth': 1.5,
@@ -83,6 +83,40 @@ def plot_clock_scan(data_filename, center_freq, fig=None, plot_live=0,
     tot = data['pico']['tot'][1:]
     frac = data['pico']['frac'][1:]
     f_aom = -1*(data['clock_aom']['frequency'][:-1] - center_freq)/unit_factor[units]   
+    order = np.argsort(f_aom)
+    
+    if fig:
+        ax = fig.get_axes()
+    else:
+        fig, ax = plt.subplots(1, 2)
+        fig.set_size_inches(20, 8)
+    
+    ax[0].plot(f_aom[order], frac[order])
+    ax[0].set_title(most_recent(data_filename).split('/')[-1])
+    ax[0].set_ylabel('excitation fraction')
+    ax[0].set_xlabel('clock aom frequency [{}]'.format(units))
+    max_point = max([max(l.get_ydata()) for l in ax[0].get_lines()])
+    min_point = min([min(l.get_ydata()) for l in ax[0].get_lines()])
+    
+    ax[0].set_ylim([min(0, 0.8*min_point), max_point*1.2])
+    
+    ax[1].plot(f_aom[order], tot[order])
+    ax[1].set_title('atom number')
+    ax[1].set_ylabel('atom number [arb.]')
+    ax[1].set_xlabel('clock aom frequency [{}]'.format(units))
+    ax[1].legend(['total', 'excited'], loc='best')
+    ax[1].set_ylim([0, tot.max()*1.2])
+    
+    return fig
+
+def plot_vclock_scan(data_filename, center_freq, fig=None, plot_live=0, 
+                    units='kHz'):
+    data = Data(most_recent(data_filename))
+#    tot = data['pico']['tot'][1:]
+#    frac = data['pico']['frac'][1:]
+    tot = data['pico']['tot'][1:]
+    frac = data['pico']['frac'][1:]
+    f_aom = -1*(data['vclock_aom']['frequency'][:-1] - center_freq)/unit_factor[units]   
     order = np.argsort(f_aom)
     
     if fig:
