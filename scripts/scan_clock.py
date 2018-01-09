@@ -27,31 +27,35 @@ V clock:
     1mW: 1.0e-3, unpol (update)
 """
 
-zero_freq = 27.8724e6
-center_shift = -24
+zero_freq = 27.900407e6
+center_shift = -101.2
+center_shift = -87.45
 #center_shift += 1e3
 
-zeeman_shift_abs = 2.373e3
-zeeman_shift_abs = 3.168e3
+zeeman_shift_abs = 2.35725e3
+#zeeman_shift_abs = 3.168e3
 #zeeman_shift_abs = 263.77
 
 rabi_time = 5.8e-3
 #rabi_time = 6.2e-3 * 7
-rabi_time = 25e-3
+rabi_time = 620e-3
+#rabi_time = 110e-3
 #rabi_time = 1e-3
 ramsey_time = 0.5
-#linewidth = 1e-3
+#linewidth = 1e3
 
 Tpi = rabi_time
 Tpi2 = Tpi / 2.
 
+Tpi = 110e-3
+
 clock_intensity = -1.
 
-range_in_linewidths = 300
+range_in_linewidths = 50
 steps_per_linewidth = 3
 
 #projection = .5:
-queue_length = 1
+queue_length = 10
 probe_type = 'bias_p'
 sequence_type = 'fast'
 
@@ -104,29 +108,8 @@ FAST_SEQUENCE = [
     'load_lattice-fast',
 #    'polarize_m-lat',
     'polarize_p-lat',
-#    'rabi_clock-pi-fast',
-#    'clean_g',
-
     'rabi_clock-pi-fast',
     'clean_g',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
-#    'zeno',
-#    'zeno2',
-#    'zeno3',
 
     'rabi_clock-fast',
 #    'ramsey_clock',
@@ -216,6 +199,7 @@ parameter_values = {
     'clock_aom': {
         'frequency': freqs,
         'center_frequency': center_freq,
+        'center_frequency': center_freq - .5,
     },
     'clock_servo': {
         'dither_lock': {},
@@ -246,7 +230,7 @@ parameter_values = {
 }
 
 if sequence_type == 'fast':
-    parameter_values['sequencer']['*T_bm'] = .2
+    parameter_values['sequencer']['*T_bm'] = .4
     parameter_values['sequencer']['*HODTf'] = HODTi
     parameter_values['sequencer']['*VODTf'] = VODTi
     parameter_values['sequencer']['*HODTi'] = HODTi

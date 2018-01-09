@@ -3,11 +3,11 @@ import json
 
 T_bm = 3
 
-HODTi = -1.2 # -1.2 good for evap to T/Tf
-HODTf = -0.065# -.07
-VODTi = -1.1 # -0.6
-VODTm = -.4 #-0.3
-VODTf = -.4 # -.03
+HODTi = -1.2
+HODTf = -0.15
+VODTi = -0.4 # -0.6
+VODTm = -.2 #-0.3
+VODTf = -.2 # -.03
 
 #T_bm = .4
 #HODTi = -.25
@@ -27,12 +27,12 @@ sequence = [
 #    'anti_polarize', 
     'evaporate',
 #    'load_lattice-fast',
-    'load_lattice',
+#    'load_lattice',
 #    'load_lattice-test',
 #    'unload_lattice-test',
 #    'rabi_clock',
-    'tof-lat',
-#    'tof',
+#    'tof-lat',
+    'tof',
     'image',
 #    'image_red',
 #    'image_ft',

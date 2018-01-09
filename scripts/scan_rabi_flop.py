@@ -3,14 +3,14 @@ import time
 
 name = 'scan_rabi_flop'
 """"""
-zero_freq = 27.8724e6
-center_shift = -24
+zero_freq = 27.900407e6
+center_shift = -103.68
+center_shift = -101.48
 zeeman_shift_abs = 2.373e3
-zeeman_shift_abs = 3.168e3
-#zeeman_shift_abs = 264
+
 #rabi_guess = .4e-3
 rabi_guess = 5.3e-3
-rabi_guess = 25e-3
+rabi_guess = 600e-3
 t_start = 0.0
 t_stop = rabi_guess * 10
 n_point = 40
@@ -83,14 +83,14 @@ FAST_SEQUENCE = [
     'load_lattice-fast',
 #    'polarize_m-lat',
     'polarize_p-lat',
-#    'rabi_clock-pi-fast',
-#    'clean_g',
-
     'rabi_clock-pi-fast',
     'clean_g',
-    'zeno',
-    'zeno',
-    'zeno',
+
+#    'rabi_clock-pi-fast',
+#    'clean_g',
+#    'zeno',
+#    'zeno',
+#    'zeno',
 #    'zeno',
 #    'zeno',
 #    'zeno',
@@ -191,7 +191,7 @@ parameter_values = {
 }
 if sequence_type == 'fast':
 #    parameter_values['sequencer']['sequence'] = FAST_SEQUENCE
-    parameter_values['sequencer']['*T_bm'] = .2
+    parameter_values['sequencer']['*T_bm'] = .3
     parameter_values['sequencer']['*HODTi'] = HODTi
     parameter_values['sequencer']['*VODTi'] = VODTi
     parameter_values['sequencer']['*VODTm'] = VODTi
