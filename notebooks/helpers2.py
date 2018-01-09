@@ -25,7 +25,7 @@ import scipy.special as sp
 
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 from scipy import signal
-from allantools import *
+#from allantools import *
 #import clock_analyzer
 #reload(clock_analyzer)
 
