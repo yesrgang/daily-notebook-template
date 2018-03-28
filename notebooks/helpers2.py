@@ -75,14 +75,37 @@ def most_recent(filename):
     else:
         return filename
 
-def plot_clock_scan(data_filename, center_freq, fig=None, plot_live=0, 
+class Data2(object):
+    """ helper class for processing data
+    
+    load: data = Data(filename)
+    features...
+    trim: makes sure entries all have same length
+    cuts: remove data from ends
+     
+    combine: data = data1 + data2
+    """
+    def __init__(self, data_dict):
+        self.data = self.to_array(data_dict)
+    
+    def to_array(self, x):
+        if type(x).__name__ == 'dict':
+            return {k: self.to_array(v) for k, v in x.items()}
+        elif type(x).__name__ == 'list':
+            return np.array(x)
+    
+    def __getitem__(self, kw):
+        return self.data[kw]
+    
+    def __setitem__(self, kw, item):
+        self.data[kw] = item
+
+def plot_clock_scan(data, center_freq, fig=None, plot_live=0, 
                     units='kHz'):
-    data = Data(most_recent(data_filename))
-#    tot = data['pico']['tot'][1:]
-#    frac = data['pico']['frac'][1:]
+    data = Data2(data)
     tot = data['pico']['tot'][1:]
     frac = data['pico']['frac'][1:]
-    f_aom = -1*(data['clock_aom']['frequency'][:-1] - center_freq)/unit_factor[units]   
+    f_aom = -1 * (data['clock_aom']['frequency'][:-1] - center_freq) / unit_factor[units]   
     order = np.argsort(f_aom)
     
     if fig:
@@ -92,7 +115,7 @@ def plot_clock_scan(data_filename, center_freq, fig=None, plot_live=0,
         fig.set_size_inches(20, 8)
     
     ax[0].plot(f_aom[order], frac[order])
-    ax[0].set_title(most_recent(data_filename).split('/')[-1])
+#    ax[0].set_title(most_recent(data_filename).split('/')[-1])
     ax[0].set_ylabel('excitation fraction')
     ax[0].set_xlabel('clock aom frequency [{}]'.format(units))
     max_point = max([max(l.get_ydata()) for l in ax[0].get_lines()])
@@ -109,11 +132,9 @@ def plot_clock_scan(data_filename, center_freq, fig=None, plot_live=0,
     
     return fig
 
-def plot_vclock_scan(data_filename, center_freq, fig=None, plot_live=0, 
+def plot_vclock_scan(data, center_freq, fig=None, plot_live=0, 
                     units='kHz'):
-    data = Data(most_recent(data_filename))
-#    tot = data['pico']['tot'][1:]
-#    frac = data['pico']['frac'][1:]
+    data = Data2(data)
     tot = data['pico']['tot'][1:]
     frac = data['pico']['frac'][1:]
     f_aom = -1*(data['vclock_aom']['frequency'][:-1] - center_freq)/unit_factor[units]   
@@ -126,7 +147,7 @@ def plot_vclock_scan(data_filename, center_freq, fig=None, plot_live=0,
         fig.set_size_inches(20, 8)
     
     ax[0].plot(f_aom[order], frac[order])
-    ax[0].set_title(most_recent(data_filename).split('/')[-1])
+#    ax[0].set_title(most_recent(data_filename).split('/')[-1])
     ax[0].set_ylabel('excitation fraction')
     ax[0].set_xlabel('clock aom frequency [{}]'.format(units))
     max_point = max([max(l.get_ydata()) for l in ax[0].get_lines()])
@@ -143,8 +164,8 @@ def plot_vclock_scan(data_filename, center_freq, fig=None, plot_live=0,
     
     return fig
 
-def plot_clock_camera(data_filename, center_freq, fig=None, plot_live=0, units='kHz'):
-    data = Data(most_recent(data_filename))    
+def plot_clock_camera(data, center_freq, fig=None, plot_live=0, units='kHz'):
+    data = Data2(data)
     gnd = data['Andor Ikon']['NSum1'][1:]
     exc = data['Andor Ikon']['NSum2'][1:]
     tot = gnd + exc
@@ -186,8 +207,8 @@ def plot_clock_camera(data_filename, center_freq, fig=None, plot_live=0, units='
     
     return fig
 
-def plot_clock_scan_bias(data_filename, scan_field, fig=None):
-    data = Data(most_recent(data_filename))
+def plot_clock_scan_bias(data, scan_field, fig=None):
+    data = Data2(data)
     tot = data['pico']['tot'][1:]
     frac = data['pico']['frac'][1:]
     
@@ -219,8 +240,8 @@ def plot_clock_scan_bias(data_filename, scan_field, fig=None):
     
     return fig
 
-def plot_scan_slosh(data_filename, camera='Mako2', fig=None, units='ms'):
-    data = Data(most_recent(data_filename))
+def plot_scan_slosh(data, camera='Mako2', fig=None, units='ms'):
+    data = Data2(data)
     x0 = data[camera]['x0'][1:]
     y0 = data[camera]['y0'][1:]
     
@@ -249,8 +270,8 @@ def plot_scan_slosh(data_filename, camera='Mako2', fig=None, units='ms'):
     return fig
 
 
-def plot_clock_lock(data_filename, center_freq, fig=None, units='Hz', subtract=None, allan_line=None, correct_by_error=True):
-    data = Data(most_recent(data_filename))
+def plot_clock_lock(data, center_freq, fig=None, units='Hz', subtract=None, allan_line=None, correct_by_error=True):
+    data = Data2(data)
     analyzer = clock_analyzer.analyzer(data)
     analyzer.add(clock_analyzer.get_locks, f0=center_freq, allan=allan_line)
     if correct_by_error:
@@ -260,15 +281,10 @@ def plot_clock_lock(data_filename, center_freq, fig=None, units='Hz', subtract=N
     analyzer.analyze()
     return analyzer.plot()
 
-def plot_clock_lock2(data_filename,
-                     center_freq,
-                     fig=None,
-                     units='Hz',
-                     average=["+9/2", "-9/2"],
-                     allan_line=None,
-                     correct_by_error=True,
-                    subtract_first_value=True):
-    data = Data(most_recent(data_filename))
+def plot_clock_lock2(data, center_freq, fig=None, units='Hz', 
+        average=["+9/2", "-9/2"], allan_line=None, correct_by_error=True,
+        subtract_first_value=True):
+    data = Data2(data)
     if len(data['time']['timestamp']) > 4:
         analyzer = clock_analyzer.analyzer(data)
         analyzer.add(clock_analyzer.get_locks,
@@ -285,8 +301,8 @@ def plot_clock_lock2(data_filename,
     else:
         return plt.figure()
 
-def plot_rabi_flop(data_filename, fig=None, plot_live=0, units='ms'):
-    data = Data(most_recent(data_filename))    
+def plot_rabi_flop(data, fig=None, plot_live=0, units='ms'):
+    data = Data2(data)
     tot = data['pico']['tot'][1:]
     frac = data['pico']['frac'][1:]
     
@@ -303,7 +319,7 @@ def plot_rabi_flop(data_filename, fig=None, plot_live=0, units='ms'):
         bx = fig.add_subplot(212)
         
     ax.plot(t, frac,'o')
-    ax.set_title(most_recent(data_filename).split('/')[-1])
+#    ax.set_title(most_recent(data_filename).split('/')[-1])
     ax.set_ylabel('excitation fraction [arb.]')
     ax.set_xlabel('clock duration [{}]'.format(units))
     max_point = max([max(l.get_ydata()) for l in ax.get_lines()])
