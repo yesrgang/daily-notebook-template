@@ -10,24 +10,19 @@ from experiments import Scan, Loop
 
 """ parameters here """
 name = 'clock_lock'
+zero_freq = 28.047e6
+center_shift = 14
+zeeman_shift = 2.3699e3
 
-zero_freq = 27.900407e6
-center_shift = -88.4
-zeeman_shift = 2.35725e3
-
-linewidth = 4.444
-linewidth = 1.3
+linewidth = 2.5
 modulation_depth = linewidth / 2.
 
-Tpi = 620e-3
-Tpi2 = Tpi / 2
-
-Tpi = 110e-3
+Tpi = 2e-3
 Tpi2 = Tpi / 2
 
 sampling_period = 2.7 * 4
-peak_height1 = .7
-peak_height2 = .7
+peak_height1 = .75
+peak_height2 = .75
 
 
 overall_gain = 1
@@ -60,7 +55,7 @@ sequence_p = [
     'rabi_clock-pi-fast',
     'clean_g',
     'rabi_clock-fast',
-    'pmt-fast',
+    'pmt-fast-v',
     ]
 
 sequence_m = [
@@ -72,9 +67,8 @@ sequence_m = [
     'rabi_clock-pi-fast',
     'clean_g',
     'rabi_clock-fast',
-    'pmt-fast',
+    'pmt-fast-v',
     ]
-
 readout_type = 'pmt'
 
 #camera_settings = {

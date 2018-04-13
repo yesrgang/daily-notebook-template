@@ -3,59 +3,35 @@ import time
 
 name = 'scan_clock'
 
-""" 
-H clock:
-    NDX: rabi_time, intensity for pi pulse  
-    ND0: 3.5e-3, -6 unpol (updated)
-    ND2: 13.5e-3, -3.5
-    ND2: 20e-3, -6 unpol (updated)
-    ND3: 25e-3, -3.5 unpol
-    ND4: 32.5e-3, -3.5 
-    ND4: 60e-3, -6 unpol (updated)
-    ND5: 100e-3, -3.5 roughly
-    ND6: 220e-3, -3.5 fast pol
-
-    ND9: 6, -1.5 seems about right
-    
-    mF = 1/2:
-    ND0: 22e-3, -6 for +/- 1/2
-
-    ND2: 130e-3, -6
-
-V clock:
-    ND0: 250e-6, all power: 5mW, unpol (updated)
-    1mW: 1.0e-3, unpol (update)
+zero_freq = 28.0487e6
+center_shift = -20
+zeeman_shift_abs = 2.3699e3
+""" rabi times
+Iclk = -7:
+    ND0: 2e-3
+    ND2: 10.5e3
+    ND4: 51e-3
+    ND6: 400e-3
+    ND7: 1.
 """
 
-zero_freq = 27.900407e6
-center_shift = -101.2
-center_shift = -87.45
-#center_shift += 1e3
+rabi_time = 2.25e-3
+#rabi_time = 400e-3
+ramsey_time = .05
 
-zeeman_shift_abs = 2.35725e3
-#zeeman_shift_abs = 3.168e3
-#zeeman_shift_abs = 263.77
+linewidth = 1e-6
+center_shift += .25 / ramsey_time
 
-rabi_time = 5.8e-3
-#rabi_time = 6.2e-3 * 7
-rabi_time = 620e-3
-#rabi_time = 110e-3
-#rabi_time = 1e-3
-ramsey_time = 0.5
-#linewidth = 1e3
-
-Tpi = rabi_time
+Tpi = 2.25e-3
 Tpi2 = Tpi / 2.
 
-Tpi = 110e-3
+clock_intensity = -2.9
 
-clock_intensity = -1.
-
-range_in_linewidths = 50
-steps_per_linewidth = 3
+range_in_linewidths = 200
+steps_per_linewidth = 8
 
 #projection = .5:
-queue_length = 10
+queue_length = 1
 probe_type = 'bias_p'
 sequence_type = 'fast'
 
@@ -80,10 +56,10 @@ elif probe_type == 'sideband':
 
 """ sequencer parameters """
 if sequence_type =='fast':
-    HODTi = -.25
-    VODTi = -.2
-    VODTm = -.2
-    VODTf = -.2
+    HODTi = -.10 #-.08
+    VODTi = -.05
+    VODTm = -.05
+    VODTf = -.05
 elif sequence_type == 'slow':
     HODTi = -1.2
     HODTf = -0.06
@@ -108,12 +84,34 @@ FAST_SEQUENCE = [
     'load_lattice-fast',
 #    'polarize_m-lat',
     'polarize_p-lat',
+#    'rabi_clock-pi-fast',
+#    'clean_g',
+    'rabi_clock-fast',
+#    'pmt-fast',
+    'pmt-fast-v',
+#    'image_clock',
+    ]
+
+FAST_SEQUENCE = [
+    'blue_mot',
+    'red_mot-fast',
+    'load_odt-fast',
+#    'depolarize',
+    'load_lattice-fast',
+#    'polarize_m-lat',
+    'polarize_p-lat',
     'rabi_clock-pi-fast',
     'clean_g',
-
-    'rabi_clock-fast',
-#    'ramsey_clock',
-    'pmt-fast',
+    'ramsey-prep',
+    'wait-for-trigger-lattice',
+    'ramsey-pi2',
+    'ramsey-dark',
+#    'ramsey-pi',
+#    'ramsey-dark',
+    'ramsey-pi2-final',
+#    'pmt-fast',
+    'pmt-fast-v',
+#    'image_clock',
     ]
 
 
@@ -163,6 +161,10 @@ try:
     linewidth
 except:
     if 'ramsey_clock' in SEQUENCE:
+        print 'Ramsey!'
+        linewidth = 0.5/ramsey_time
+    elif 'ramsey-pi2' in SEQUENCE:
+        print 'Ramsey!'
         linewidth = 0.5/ramsey_time
     else:
         linewidth = .8/rabi_time
@@ -174,7 +176,9 @@ f_range = range_in_linewidths * linewidth
 f_step = float(linewidth) / steps_per_linewidth
 freqs = np.arange(center_freq-f_range, center_freq + f_range, f_step)
 if 'ramsey_clock' in SEQUENCE:
-    freqs = np.arange(center_freq - f_range, center_freq, f_step)[::-1]
+    freqs = np.arange(center_freq - f_range, center_freq + f_step, f_step)[::-1]
+elif 'ramsey-pi2' in SEQUENCE:
+    freqs = np.arange(center_freq - f_range, center_freq + f_step, f_step)[::-1]
 else:
     freqs = np.array([freqs[len(freqs)/2-(i+1)/2*(-1)**(i+1)] for i in range(len(freqs))])
 
@@ -198,8 +202,10 @@ parameter_values = {
 #    },
     'clock_aom': {
         'frequency': freqs,
+#        'frequency3': freqs,
         'center_frequency': center_freq,
-        'center_frequency': center_freq - .5,
+#        'center_frequency': freqs,
+#        'center_frequency': center_freq - .5,
     },
     'clock_servo': {
         'dither_lock': {},
@@ -219,18 +225,18 @@ parameter_values = {
         'plot': {
             'plotter_path': DATA_DIR + 'notebooks/helpers2.py',
             'plotter_function': 'plot_clock_scan',
-            'args': [DATA_DIR + name, center_freq],
+            'args': [center_freq],
             'kwargs': {'units': 'Hz'},
         },
     },
-    "andor": {
-        "recorder": {},
-        "image_path": None,
-        },
+#    "andor": {
+#        "recorder": {},
+#        "image_path": None,
+#        },
 }
 
 if sequence_type == 'fast':
-    parameter_values['sequencer']['*T_bm'] = .4
+    parameter_values['sequencer']['*T_bm'] = .8
     parameter_values['sequencer']['*HODTf'] = HODTi
     parameter_values['sequencer']['*VODTf'] = VODTi
     parameter_values['sequencer']['*HODTi'] = HODTi

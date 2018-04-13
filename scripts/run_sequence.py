@@ -3,11 +3,11 @@ import json
 
 T_bm = 3
 
-HODTi = -1.2
-HODTf = -0.15
-VODTi = -0.4 # -0.6
-VODTm = -.2 #-0.3
-VODTf = -.2 # -.03
+HODTi = -2.0
+HODTf = -0.2
+VODTi = -0.6 # -0.6
+VODTm = -.1 #-0.3
+VODTf = -.1 # -.03
 
 #T_bm = .4
 #HODTi = -.25
@@ -22,10 +22,12 @@ sequence = [
 #    'red_mot-fast',     
     'red_mot',     
 #    'load_odt-fast',
-    'load_odt',
-    'depolarize',
+#    'load_odt',
+     'load_odt_trans',
+#    'load_odt_tof',
+#    'depolarize',
 #    'anti_polarize', 
-    'evaporate',
+#    'evaporate',
 #    'load_lattice-fast',
 #    'load_lattice',
 #    'load_lattice-test',
@@ -33,15 +35,29 @@ sequence = [
 #    'rabi_clock',
 #    'tof-lat',
     'tof',
+#    'find_trans',
     'image',
 #    'image_red',
 #    'image_ft',
 #    'image_clock',
 #    'pmt'
 ]
+#T_bm = 1
+#HODTi = -0.09
+#HODTf = -0.09
+#VODTi = -0.05 # -0.6
+#VODTm = -.05 #-0.3
+#VODTf = -.05 # -.03
+#sequence = [
+#    'blue_mot',
+#    'red_mot-fast',     
+#    'load_odt-fast',
+#    'tof',
+#    'image',
+#]
 
 #sequence = ['blue_blink']*40
-#sequence = ['habs-blink']*10
+#sequence = ['habs-blink']*40
 #sequence = ['rabi_clock-test']*20
 #sequence = ['test']
 
